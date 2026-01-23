@@ -1,0 +1,11 @@
+# Base XML parser for Windows Security logs
+# Purpose: Extract common authentication fields from XmlWinEventLog:Security
+# Event IDs: 4625, 4740
+
+index=main sourcetype=XmlWinEventLog:Security
+| rex field=_raw "<EventID>(?<event_id>\d+)</EventID>"
+| rex field=_raw "Data Name='TargetUserName'>(?<target_user>[^<]+)<"
+| rex field=_raw "Data Name='TargetDomainName'>(?<target_domain>[^<]+)<"
+| rex field=_raw "Data Name='WorkstationName'>(?<workstation>[^<]+)<"
+| rex field=_raw "Data Name='IpAddress'>(?<src_ip>[^<]+)<"
+| rex field=_raw "Data Name='LogonType'>(?<logon_type>\d+)<"

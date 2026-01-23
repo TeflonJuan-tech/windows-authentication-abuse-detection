@@ -1,0 +1,10 @@
+# Brute force detection
+# Logic: High volume of failed logons against a single user
+# Event ID: 4625
+
+index=main sourcetype=XmlWinEventLog:Security "<EventID>4625</EventID>"
+| rex field=_raw "Data Name='TargetUserName'>(?<target_user>[^<]+)<"
+| bin _time span=5m
+| stats count as failures by _time host target_user
+| where failures >= 5
+| sort - failures

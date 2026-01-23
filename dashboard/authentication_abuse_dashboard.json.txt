@@ -1,0 +1,76 @@
+<dashboard version="1.1" theme="dark">
+  <label>Authentication Abuse Monitoring Copy</label>
+  <row>
+    <panel>
+      <title>Failed Logons (4625) Over Time</title>
+      <chart>
+        <search>
+          <query>index=main sourcetype=XmlWinEventLog:Security "&lt;EventID&gt;4625&lt;/EventID&gt;"
+| timechart span=5m count as failed_logons</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="height">208</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Potential Brute Force — Failed Logons per User</title>
+        <search>
+          <query>index=main sourcetype=XmlWinEventLog:Security "&lt;EventID&gt;4625&lt;/EventID&gt;"
+| rex field=_raw "Data Name='TargetUserName'&gt;(?&lt;target_user&gt;[^&lt;]+)&lt;"
+| bin _time span=5m
+| stats count as failures by _time target_user
+| where failures &gt;= 5
+| sort - failures</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="height">248</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Potential Password Spray Activity</title>
+        <search>
+          <query>index=main sourcetype=XmlWinEventLog:Security "&lt;EventID&gt;4625&lt;/EventID&gt;"
+| rex field=_raw "Data Name='TargetUserName'&gt;(?&lt;target_user&gt;[^&lt;]+)&lt;"
+| rex field=_raw "Data Name='IpAddress'&gt;(?&lt;src_ip&gt;[^&lt;]+)&lt;"
+| eval src_ip=coalesce(src_ip,"unknown")
+| bin _time span=10m
+| stats count as failures dc(target_user) as distinct_users values(target_user) as users by _time src_ip
+| where distinct_users &gt;= 3 AND failures &gt;= 3
+| sort - failures</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Account Lockouts (4740)</title>
+        <search>
+          <query>index=main sourcetype=XmlWinEventLog:Security "&lt;EventID&gt;4740&lt;/EventID&gt;"
+| rex field=_raw "Data Name='TargetUserName'&gt;(?&lt;target_user&gt;[^&lt;]+)&lt;"
+| table _time host target_user
+| sort - _time</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

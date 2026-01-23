@@ -1,0 +1,8 @@
+# Account lockout detection
+# Logic: Identify locked accounts after authentication abuse
+# Event ID: 4740
+
+index=main sourcetype=XmlWinEventLog:Security "<EventID>4740</EventID>"
+| rex field=_raw "Data Name='TargetUserName'>(?<target_user>[^<]+)<"
+| table _time host target_user
+| sort - _time

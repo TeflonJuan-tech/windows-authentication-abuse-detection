@@ -1,0 +1,82 @@
+Home Lab — Detect Authentication Abuse Patterns
+Full Session Summary (Phases 0–3)
+
+Date: 2026-01-23
+Focus: Detection Engineering, Simulation, Visualization
+Stack: Windows Security Logs → Splunk Universal Forwarder → Splunk Enterprise
+
+Phase 0 — Telemetry Health Gate (Validated)
+
+Began by validating foundational telemetry health before any detection work. Confirmed that the Splunk Universal Forwarder was properly installed, registered, and running on the Windows VM. Verified forwarder binaries existed and that network connectivity between the Windows host and Splunk Enterprise receiver was stable. Time synchronization across systems was confirmed to ensure accurate event correlation. This phase ensured the environment was trustworthy before proceeding.
+
+Phase 1 — Security Event Ingestion (Completed)
+
+Confirmed Windows was actively generating failed authentication events (Event ID 4625) via Event Viewer and PowerShell. Initial investigation revealed Security logs were not ingesting due to a missing WinEventLog://Security stanza in inputs.conf. Added the stanza with XML rendering enabled and validated ingestion after restarting the forwarder.
+
+Security logs successfully appeared in Splunk under XmlWinEventLog:Security. Event ID 4625 was confirmed via raw XML search and manual extraction using rex. Learned that the absence of normalized fields (EventCode/EventID) was due to XML ingestion format rather than ingestion failure. End-to-end telemetry pipeline (Windows → UF → Splunk) was fully validated.
+
+Phase 2 — Detection Engineering & Simulation (Completed)
+
+Chose a detection-first, XML-aware approach rather than waiting for CIM normalization.
+
+Base Parser
+
+Built a reusable XML parser to extract:
+
+Event ID
+
+Target username
+
+Domain
+
+Source IP
+
+Workstation
+
+Logon type
+
+Validated parser across thousands of Security events, confirming reliable field extraction.
+
+Brute Force Simulation
+
+Simulated a brute-force attack by performing 10 failed logon attempts against a single local user. This triggered:
+
+A burst of Event ID 4625 events
+
+A subsequent Event ID 4740 account lockout
+
+Detection logic correctly aggregated failures within a 5-minute window. Threshold tuning validated a defensible brute-force threshold of ≥5 failures in 5 minutes per user.
+
+Password Spray Simulation
+
+Created multiple non-privileged local user accounts for testing. Simulated a password spray attack by performing limited failed attempts across three distinct users from the same source. Detection logic correctly identified the spray pattern using distinct user counts rather than raw failure volume. Final spray threshold validated at ≥3 users and ≥3 failures within 10 minutes.
+
+This phase demonstrated clear differentiation between brute-force, password spray, and lockout behaviors.
+
+Phase 3 — Visualization & Dashboarding (Completed)
+
+Built a focused Authentication Abuse Monitoring dashboard to visualize detection logic and outcomes. Dashboard includes:
+
+Failed logons (4625) over time
+
+Potential brute-force activity (single user focus)
+
+Potential password spray activity (multi-user focus)
+
+Account lockouts (4740) showing policy impact
+
+Dashboard layout was intentionally designed to guide analysis from signal → pattern → impact. Panels were reviewed and polished for clarity, SOC-readability, and portfolio presentation. No alerts were enabled at this stage to preserve analytical intent.
+
+Key Outcomes & Lessons Learned
+
+Missing ingestion stanzas can silently block critical telemetry
+
+XML-based WinEventLog ingestion requires intentional parsing strategies
+
+Detection thresholds must be tuned to environment behavior
+
+“No results” can indicate healthy detection logic, not failure
+
+Authentication abuse patterns must be differentiated by depth vs breadth
+
+Visualization is critical for communicating detection value
