@@ -1,5 +1,10 @@
 <dashboard version="1.1" theme="dark">
-  <label>Authentication Abuse Monitoring Copy</label>
+  <label>Authentication Abuse Monitoring</label>
+  <description>
+SOC-style dashboard visualizing Windows authentication abuse patterns
+including brute force, password spray, and account lockouts.
+</description>
+
   <row>
     <panel>
       <title>Failed Logons (4625) Over Time</title>
