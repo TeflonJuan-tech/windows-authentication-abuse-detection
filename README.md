@@ -36,8 +36,6 @@ Before building detections, the lab validated end-to-end telemetry health:
 
 The following detection patterns were implemented and validated using real telemetry.
 
----
-
 ## MITRE ATT&CK Mapping
 
 | Detection Category         | ATT&CK Technique ID | Technique Name                             |
@@ -46,13 +44,15 @@ The following detection patterns were implemented and validated using real telem
 | Password Spray Detection  | T1110.003           | Password Spray                             |
 | Account Lockout Alerting  | T1110               | Brute Force Authentication (Parent)        |
 
+
 ---
 
-### MITRE ATT&CK: T1110.002 — Brute Force: Password Guessing
+### Brute Force Detection
 
 Identifies high-volume failed logons targeting a single user within a short time window.
 
-- Event ID: 4625  
+- MITRE ATT&CK: **T1110.002 — Brute Force: Password Guessing**
+- Event ID: 4625
 - Threshold: ≥ 5 failures in 5 minutes per user  
 - Pattern Type: Depth-based authentication abuse  
 
@@ -62,11 +62,12 @@ Identifies high-volume failed logons targeting a single user within a short time
 
 ---
 
-### MITRE ATT&CK: T1110.003 — Password Spray
+### Password Spray Detection
 
 Identifies low-volume failed logons across multiple distinct users from a single source.
 
-- Event ID: 4625  
+- MITRE ATT&CK: **T1110.003 — Password Spray**
+- Event ID: 4625
 - Threshold: ≥ 3 users and ≥ 3 failures within 10 minutes  
 - Pattern Type: Breadth-based authentication abuse  
 
@@ -76,11 +77,12 @@ Identifies low-volume failed logons across multiple distinct users from a single
 
 ---
 
-### MITRE ATT&CK (support signal): T1110 — Brute Force Authentication
+### Account Lockout Detection
 
 Identifies accounts locked due to authentication abuse.
 
-- Event ID: 4740  
+- MITRE ATT&CK (support signal): **T1110 — Brute Force Authentication**
+- Event ID: 4740
 - Purpose: Confirms real impact of failed authentication attempts  
 
 #### Account Lockout Validation — Event ID 4740
