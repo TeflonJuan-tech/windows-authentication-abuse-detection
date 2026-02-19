@@ -38,6 +38,16 @@ The following detection patterns were implemented and validated using real telem
 
 ---
 
+## MITRE ATT&CK Mapping
+
+| Detection Category         | ATT&CK Technique ID | Technique Name                             |
+|---------------------------|---------------------|--------------------------------------------|
+| Brute Force Login         | T1110.002           | Brute Force: Password Guessing             |
+| Password Spray Detection  | T1110.003           | Password Spray                             |
+| Account Lockout Alerting  | T1110               | Brute Force Authentication (Parent)        |
+
+---
+
 ### Brute Force Detection
 
 Identifies high-volume failed logons targeting a single user within a short time window.
