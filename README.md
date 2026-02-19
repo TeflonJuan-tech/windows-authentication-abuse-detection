@@ -48,7 +48,7 @@ The following detection patterns were implemented and validated using real telem
 
 ---
 
-### Brute Force Detection
+### MITRE ATT&CK: T1110.002 — Brute Force: Password Guessing
 
 Identifies high-volume failed logons targeting a single user within a short time window.
 
@@ -62,7 +62,7 @@ Identifies high-volume failed logons targeting a single user within a short time
 
 ---
 
-### Password Spray Detection
+### MITRE ATT&CK: T1110.003 — Password Spray
 
 Identifies low-volume failed logons across multiple distinct users from a single source.
 
@@ -76,7 +76,7 @@ Identifies low-volume failed logons across multiple distinct users from a single
 
 ---
 
-### Account Lockout Detection
+### MITRE ATT&CK (support signal): T1110 — Brute Force Authentication
 
 Identifies accounts locked due to authentication abuse.
 
