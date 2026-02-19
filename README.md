@@ -32,18 +32,16 @@ Before building detections, the lab validated end-to-end telemetry health:
 
 ---
 
-## Detection Logic
-
-The following detection patterns were implemented and validated using real telemetry.
-
 ## MITRE ATT&CK Mapping
 
-| Detection Category         | ATT&CK Technique ID | Technique Name                             |
-|---------------------------|---------------------|--------------------------------------------|
-| Brute Force Login         | T1110.002           | Brute Force: Password Guessing             |
-| Password Spray Detection  | T1110.003           | Password Spray                             |
-| Account Lockout Alerting  | T1110               | Brute Force Authentication (Parent)        |
+| Detection Category | Tactic | Technique | ID | Notes |
+|---|---|---|---|---|
+| Brute Force Login | Credential Access | Brute Force: Password Guessing | T1110.002 | Depth-based: repeated failures against a single account (Event ID 4625) |
+| Password Spray Detection | Credential Access | Brute Force: Password Spraying | T1110.003 | Breadth-based: multiple accounts targeted from one source (Event ID 4625) |
+| Account Lockout Alerting | Credential Access | Brute Force | T1110 | Support signal: validates impact/outcome via account lockout (Event ID 4740) |
 
+For a visual reference of the mapped techniques in the ATT&CK matrix, see:
+https://attack.mitre.org/techniques/T1110/
 
 ---
 
