@@ -1,60 +1,125 @@
 # Authentication Abuse Detection with Splunk
 
 ## Overview
-This project demonstrates detection engineering techniques for identifying Windows authentication abuse using native Security logs ingested into Splunk. The focus is on detecting brute-force attacks, password spray attacks, and account lockouts through validated telemetry, tuned thresholds, and SOC-style visualization.
+
+This project demonstrates detection engineering techniques for identifying Windows authentication abuse using native Security logs ingested into Splunk.
+
+The focus is on detecting brute-force attacks, password spray attacks, and account lockouts through validated telemetry, tuned thresholds, and SOC-style visualization.
+
+---
 
 ## Environment
+
 - Windows 10 VM (local users)
 - Splunk Enterprise (Linux VM)
 - Splunk Universal Forwarder
 - Windows Security Logs (`XmlWinEventLog:Security`)
 
+---
+
 ## Telemetry Validation
+
 Before building detections, the lab validated end-to-end telemetry health:
+
 - Confirmed Windows generated failed logon events (Event ID 4625)
 - Added and validated `WinEventLog://Security` input
 - Verified Security events were ingested into Splunk via XML
 - Confirmed account lockout events (Event ID 4740)
 
+#### Security Log Ingestion Validation
+
+![Security Log Ingestion Validation](screenshots/security_ingestion_validation.png)
+
+---
+
 ## Detection Logic
-The following detection patterns were implemented and validated using real telemetry:
+
+The following detection patterns were implemented and validated using real telemetry.
+
+---
 
 ### Brute Force Detection
+
 Identifies high-volume failed logons targeting a single user within a short time window.
 
-- Event ID: 4625
-- Threshold: ≥ 5 failures in 5 minutes per user
+- Event ID: 4625  
+- Threshold: ≥ 5 failures in 5 minutes per user  
+- Pattern Type: Depth-based authentication abuse  
+
+#### Brute Force Detection — 4625 Burst Behavior
+
+![Brute Force Detection](screenshots/brute_force_detection.png)
+
+---
 
 ### Password Spray Detection
+
 Identifies low-volume failed logons across multiple distinct users from a single source.
 
-- Event ID: 4625
-- Threshold: ≥ 3 users and ≥ 3 failures within 10 minutes
+- Event ID: 4625  
+- Threshold: ≥ 3 users and ≥ 3 failures within 10 minutes  
+- Pattern Type: Breadth-based authentication abuse  
+
+#### Password Spray Detection — Multi-User Targeting
+
+![Password Spray Detection](screenshots/password_spray_detection.png)
+
+---
 
 ### Account Lockout Detection
+
 Identifies accounts locked due to authentication abuse.
 
-- Event ID: 4740
+- Event ID: 4740  
+- Purpose: Confirms real impact of failed authentication attempts  
+
+#### Account Lockout Validation — Event ID 4740
+
+![Account Lockout Event](screenshots/account_lockout_4740.png)
 
 Detection searches are stored in the `searches/` directory.
 
-## Dashboard
-A dedicated dashboard was built to visualize authentication abuse patterns:
+---
+
+## Detection Dashboard
+
+A Splunk dashboard was developed to centralize visibility into authentication abuse patterns and support analyst triage.
+
+The dashboard consolidates:
+
 - Failed logons over time
-- Potential brute-force activity
-- Potential password spray activity
-- Account lockouts
+- Brute-force burst detection
+- Password spray behavior
+- Account lockouts (Event ID 4740)
+
+The objective is to provide:
+
+- Rapid pattern recognition
+- Threshold validation
+- Lockout impact awareness
+- SOC-style operational visibility
+
+#### Dashboard Overview
+
+![Detection Dashboard Overview](screenshots/dashboard_overview.png)
 
 The dashboard export is available in the `dashboard/` directory.
 
+---
+
 ## Key Takeaways
+
 - Authentication abuse patterns must be differentiated by depth (brute force) vs breadth (spray)
 - Detection thresholds should be tuned to real environment behavior
 - XML-based Windows logs require intentional parsing strategies
-- Visualization is critical for rapid SOC triage
+- Visualization supports rapid SOC triage and signal clustering
+
+---
 
 ## Future Work
+
 - Endpoint telemetry enrichment using Sysmon
 - Correlation of authentication abuse with post-authentication behavior
 - Alerting and response automation
+
 
